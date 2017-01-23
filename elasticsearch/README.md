@@ -1,4 +1,4 @@
-# alpine-elasticsearch
+# elasticsearch
 Elasticsearch docker image of smaller than official version.
 
 ## Base Image
@@ -7,8 +7,9 @@ Elasticsearch docker image of smaller than official version.
 ## Environment
 - Alpine Linux 3.4
 - Oracle Java 8 JDK
-- Elasticsearch 5.1.1
+- Elasticsearch 5.1.2
 
+#### Version: 5.1.2, Build: c8c4c16/2017-01-11T20:18:39.146Z, JVM: 1.8.0_121
 
 ## Running Containers
 
@@ -21,7 +22,7 @@ $ docker run -d gleez/elasticsearch
 You can also pass in additional flags to `elasticsearch`:
 
 ```console
-$ docker run -d gleez/alpine-elasticsearch -Des.node.name="TestNode"
+$ docker run -d gleez/elasticsearch -Des.node.name="TestNode"
 ```
 
 This image comes with a default set of configuration files for `elasticsearch`, but if you want to provide your own set of configuration files, you can do so via a volume mounted at `/usr/share/elasticsearch/config`:
