@@ -1,0 +1,15 @@
+[Unit]
+Description=Ubuntu apt packages cache Container
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/usr/bin/docker stop apt-cache
+ExecStartPre=-/usr/bin/docker rm apt-cache
+ExecStart=/usr/bin/docker run --rm --name apt-cache -p 3142:3142 -v $(pwd):/var/cache/apt-cacher-ng:Z gleez/cache:xenial
+ExecStop=/usr/bin/docker stop apt-cache
+
+[Install]
+WantedBy=multi-user.target
