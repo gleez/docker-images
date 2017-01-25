@@ -19,6 +19,7 @@ RUN apt-get update && apt-get -y install \
 	libpcre3 libpcre3-dev \
 	cmake gawk libmysqlclient-dev \
 	libgeoip1 libgeoip-dev \
+	libhiredis-dev quilt libperl-dev \
 	google-perftools libgoogle-perftools-dev \
   	libxml2-dev libmcrypt-dev libicu-dev openssl binutils-dev \
   	libcap-dev zlib1g-dev libtbb-dev libonig-dev libpcre3-dev \
