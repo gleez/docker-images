@@ -4,15 +4,17 @@ Elasticsearch docker image of smaller than official version.
 ## Base Image
 - anapsix/alpine-java:jdk8
 
+#### Version: 5.1.2, Build: c8c4c16/2017-01-11T20:18:39.146Z, JVM: 1.8.0_121
+
 ## Environment
 - Alpine Linux 3.4
 - Oracle Java 8 JDK
 - Elasticsearch 5.1.2
 
-#### Version: 5.1.2, Build: c8c4c16/2017-01-11T20:18:39.146Z, JVM: 1.8.0_121
+#### For docker configuration settings:
+https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
 
 ## Running Containers
-
 You can run the default `elasticsearch` command simply:
 
 ```console
@@ -39,8 +41,5 @@ $ docker run -d -v "$PWD/esdata":/usr/share/elasticsearch/data gleez/elasticsear
 
 This image includes `EXPOSE 9200 9300` ([default `http.port`](http://www.elastic.co/guide/en/elasticsearch/reference/1.5/modules-http.html)), so standard container linking will make it automatically available to the linked containers.
 
-
-
 ## License
-
 [MIT](http://opensource.org/licenses/MIT)
