@@ -2,9 +2,9 @@
 
 -	[`latest` (*xtrabackup/Dockerfile*)](https://github.com/gleez/docker-images/blob/master/xtrabackup/Dockerfile)
 
-# MySQL with Percona Xtrabackup
+# Percona Xtrabackup
 
-Derived from the official Docker MySQL image. The image contains Percona Xtrabackup installed and a simple bash script to run the backup command.
+Derived from the official Docker Debian Jessie image. The image contains Percona Xtrabackup installed and a simple bash script to run the backup command.
 
 # How to use this image?
 

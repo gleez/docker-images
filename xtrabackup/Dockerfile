@@ -1,12 +1,12 @@
-FROM mysql:5.7
+FROM debian:jessie
 MAINTAINER Sandeep Sangamreddi <sandeepone@gmail.com>
  
 RUN \
     echo "deb http://repo.percona.com/apt jessie main" > /etc/apt/sources.list.d/percona-release.list \
-    && apt-key adv --keyserver keys.gnupg.net --recv-keys 1C4CBDCDCD2EFD2A \
+    && apt-key adv --keyserver ha.pool.sks-keyservers.net --recv-keys 9334A25F8507EFA5 \
     && apt-get update \
-	&& apt-get install --no-install-recommends --no-install-suggests -y --force-yes \
-	percona-xtrabackup-24 percona-toolkit mytop \
+	&& apt-get install --no-install-recommends --no-install-suggests -y \
+	percona-xtrabackup-24 percona-toolkit qpress \
 	&& mkdir -p /backups \
 	&& apt-get -y autoremove && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
