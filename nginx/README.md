@@ -1,6 +1,7 @@
 # Supported tags and respective `Dockerfile` links
 
 -	[`1.10.2` (*nginx/Dockerfile*)](https://github.com/gleez/docker-images/blob/master/nginx/Dockerfile)
+-	[`1.10.3` (*nginx/Dockerfile*)](https://github.com/gleez/docker-images/blob/master/nginx/Dockerfile)
 
 ### Nginx  with OpenSSL 1.1.0c
 
@@ -34,7 +35,7 @@ Nginx (pronounced "engine-x") is an open source reverse proxy server for HTTP, H
 ## hosting some simple static content
 
 ```console
-$ docker run --name some-nginx -v /some/content:/usr/share/nginx/html:ro -d gleez/nginx:1.10.2
+$ docker run --name some-nginx -v /some/content:/usr/share/nginx/html:ro -d gleez/nginx:1.10.3
 ```
 
 Alternatively, a simple `Dockerfile` can be used to generate a new image that includes the necessary content (which is a much cleaner solution than the bind mount above):
@@ -61,8 +62,21 @@ Then you can hit `http://localhost:8080` or `http://host-ip:8080` in your browse
 ## complex configuration
 
 ```console
-$ docker run --name some-nginx -v /some/nginx.conf:/etc/nginx/nginx.conf:ro -d gleez/nginx:1.10.2
+$ docker run --name some-nginx -v /some/nginx.conf:/etc/nginx/nginx.conf:ro -d gleez/nginx:1.10.3
 ```
+
+or
+
+```console
+$ docker run \
+  --detach \
+  --name some-nginx \
+  --publish 8080:80 \
+  --volume /some/nginx:/usr/share/nginx/html \
+  --volume /some/nginx.conf:/etc/nginx/nginx.conf \
+  gleez/nginx:1.10.3
+```
+
 
 For information on the syntax of the Nginx configuration files, see [the official documentation](http://nginx.org/en/docs/) (specifically the [Beginner's Guide](http://nginx.org/en/docs/beginners_guide.html#conf_structure)).
 
@@ -94,7 +108,7 @@ Out-of-the-box, Nginx doesn't support using environment variables inside most co
 Here is an example using docker-compose.yml:
 
 ```web:
-  image: gleez/nginx:1.10.2
+  image: gleez/nginx:1.10.3
   volumes:
    - ./mysite.template:/etc/nginx/conf.d/mysite.template
   ports:
@@ -113,8 +127,6 @@ The `mysite.template` file may then contain variable references like this :
 # Image Variants
 
 The `nginx` images come in many flavors, each designed for a specific use case.
-
-## `gleez/nginx:1.10.2`
 
 This is the defacto image. If you are unsure about what your needs are, you probably want to use this one. It is designed to be used both as a throw away container (mount your source code and start the container to start your app), as well as the base to build other images off of.
 

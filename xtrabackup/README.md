@@ -40,16 +40,16 @@ You should see Xtrabackup output on the screen. Ensure you get the “completed 
 
 ```bash
 ...
-innobackupex: Backup created in directory '/backups/2017-01-17_17-07-54'
-160617 17:07:57  innobackupex: Connection to database server closed
-160617 17:07:57  innobackupex: completed OK!
+innobackupex: Backup created in directory '/backups/2017-02-02_07-00-28'
+170202 17:07:57  innobackupex: Connection to database server closed
+170202 17:07:57  innobackupex: completed OK!
 ```
 
 The container will then exit (the "run" is executed interactively) and automatically removed by Docker since we specified “--rm=true” in the command line. On the machine host, we can see the backups are there:
 
 ```bash
 $ ls -1 /storage/backups/
-2017-01-17_13-01-58
+2017-02-02_07-00-28
 2017-01-17_13-07-28
 2017-01-17_14-02-50
 ```
