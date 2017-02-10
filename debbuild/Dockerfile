@@ -30,7 +30,7 @@ RUN apt-get update && apt-get -y install \
   	libarchive13 cmake-data libacl1 libattr1 libgd2-xpm-dev \
   	pkg-config libmagickwand-dev libiberty-dev libevent-dev libxslt-dev libgoogle-glog-dev \
   	automake libldap2-dev libkrb5-dev libyaml-dev gperf ocaml-native-compilers libpq-dev \
-	dh-systemd libluajit-5.1-2 libluajit-5.1-common libluajit-5.1-dev liblua5.1-0-dev libmhash-dev libmhash2 libperl-dev \
+	dh-systemd libluajit-5.1-2 libluajit-5.1-common libluajit-5.1-dev libmhash-dev libmhash2 libperl-dev \
     --no-install-recommends
 
 # overwrite this with 'CMD []' in a dependent Dockerfile

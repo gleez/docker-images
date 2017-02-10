@@ -1,7 +1,7 @@
 # Supported tags and respective `Dockerfile` links
 
--	[`1.10.2` (*nginx/Dockerfile*)](https://github.com/gleez/docker-images/blob/master/nginx/Dockerfile)
 -	[`1.10.3` (*nginx/Dockerfile*)](https://github.com/gleez/docker-images/blob/master/nginx/Dockerfile)
+-	[`1.10.2` (*nginx/Dockerfile*)](https://github.com/gleez/docker-images/blob/master/nginx/Dockerfile)
 
 ### Nginx  with OpenSSL 1.1.0c
 
@@ -72,11 +72,10 @@ $ docker run \
   --detach \
   --name some-nginx \
   --publish 8080:80 \
-  --volume /some/nginx:/usr/share/nginx/html \
+  --volume /some/html:/usr/share/nginx/html \
   --volume /some/nginx.conf:/etc/nginx/nginx.conf \
   gleez/nginx:1.10.3
 ```
-
 
 For information on the syntax of the Nginx configuration files, see [the official documentation](http://nginx.org/en/docs/) (specifically the [Beginner's Guide](http://nginx.org/en/docs/beginners_guide.html#conf_structure)).
 
@@ -133,7 +132,5 @@ This is the defacto image. If you are unsure about what your needs are, you prob
 # Supported Docker versions
 
 This image is officially supported on Docker version 1.13.0.
-
-Support for older versions (down to 1.6) is provided on a best-effort basis.
 
 Please see [the Docker installation documentation](https://docs.docker.com/installation/) for details on how to upgrade your Docker daemon.
