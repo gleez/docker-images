@@ -1,6 +1,6 @@
 FROM gleez/hhvm:3.18.1
 
-RUN mkdir -p /var/www/public
+RUN mkdir -p /var/www
 
 ADD server.ini /etc/hhvm/server.ini
 
