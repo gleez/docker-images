@@ -1,7 +1,4 @@
-FROM anapsix/alpine-java:8_jdk
-MAINTAINER Sandeep Sangamreddi <sandeepone@gmail.com>
-LABEL repository.hub="gleez/elasticsearch" \
-      repository.url="https://github.com/gleez/docker-images"
+FROM gleez/alpine-java:8_jdk
 
 # https://artifacts.elastic.co/GPG-KEY-elasticsearch
 
@@ -17,11 +14,11 @@ RUN addgroup -S elasticsearch && adduser -S -G elasticsearch elasticsearch && ap
 WORKDIR /usr/share/elasticsearch
 ENV PATH /usr/share/elasticsearch/bin:$PATH
 
-ENV ELASTICSEARCH_VERSION="5.1.2" \
+ENV ELASTICSEARCH_VERSION="5.3.1" \
 	GPG_KEY="46095ACC8548582C1A2699A9D27D666CD88E42B4" \
-	ELASTICSEARCH_TARBALL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.2.tar.gz" \
-	ELASTICSEARCH_TARBALL_ASC="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.2.tar.gz.asc" \
-	ELASTICSEARCH_TARBALL_SHA1="ae3d5b0d631a61e72b88f930b3cc9f8475a766d6"
+	ELASTICSEARCH_TARBALL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.3.1.tar.gz" \
+	ELASTICSEARCH_TARBALL_ASC="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.3.1.tar.gz.asc" \
+	ELASTICSEARCH_TARBALL_SHA1="26100fb2b2c824530f29a7cc6148e2315e1a1fe3"
 
 RUN set -ex; \
 	\
@@ -63,6 +60,8 @@ RUN set -ex; \
 		chown -R elasticsearch:elasticsearch "$path"; \
 	done; \
 	\
+# we shouldn't need much RAM to test --version (default is 2gb, which gets Jenkins in trouble sometimes)
+	export ES_JAVA_OPTS='-Xms32m -Xmx32m'; \
 	if [ "${ELASTICSEARCH_VERSION%%.*}" -gt 1 ]; then \
 		elasticsearch --version; \
 	else \
