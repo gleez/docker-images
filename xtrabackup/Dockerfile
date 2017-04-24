@@ -1,6 +1,5 @@
 FROM debian:jessie
-MAINTAINER Sandeep Sangamreddi <sandeepone@gmail.com>
- 
+
 RUN \
     echo "deb http://repo.percona.com/apt jessie main" > /etc/apt/sources.list.d/percona-release.list \
     && apt-key adv --keyserver ha.pool.sks-keyservers.net --recv-keys 9334A25F8507EFA5 \

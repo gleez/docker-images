@@ -1,10 +1,6 @@
 # Taken from: https://docs.docker.com/examples/apt-cacher-ng/
 
 FROM ubuntu:xenial
-MAINTAINER Sandeep Sangamreddi <sandeepone@gmail.com>
-
-LABEL repository.hub="gleez/apt-cache" \
-      repository.url="https://github.com/gleez/docker-images"
 
 VOLUME  /var/cache/apt-cacher-ng
 RUN     apt-get update && apt-get install -y apt-cacher-ng
