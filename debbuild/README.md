@@ -16,6 +16,7 @@ $ docker pull gleez/debbuild
 ## Usage
 
     docker run -it gleez/debbuild /bin/bash
+    docker run -v /home/gleez/Projects/Docker/nginx/src:/build -it gleez/debbuild /bin/bash
     
 You can add a workspace as a volume directory with the argument *-v /your-path/build/:/build/* like this :
 
