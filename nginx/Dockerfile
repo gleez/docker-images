@@ -1,7 +1,6 @@
 FROM ubuntu:xenial
-MAINTAINER Sandeep Sangamreddi <sandeepone@gmail.com>
 
-ENV NGINX_VERSION 1.10.3-4~xenial
+ENV NGINX_VERSION 1.12.0-2~xenial
 
 COPY nginx_${NGINX_VERSION}_amd64.deb /tmp/
 
@@ -9,7 +8,7 @@ RUN apt-get update \
 ##	&& apt-get upgrade -y \
 	&& apt-get install --no-install-recommends --no-install-suggests -y \
 				libc6 libexpat1 libgcc1 libgd3 libgeoip1 libhiredis0.13 \
-				libluajit-5.1-2 lua-cjson libpcre3 libperl5.22 libstdc++6 libxml2 \
+				libluajit-5.1-2 liblua5.1-0 lua-cjson libpcre3 libperl5.22 libstdc++6 libxml2 \
 				libxslt1.1 zlib1g lsb-base adduser ca-certificates gettext-base \
 	&& dpkg -i /tmp/nginx_${NGINX_VERSION}_amd64.deb \
 	&& apt-get clean \

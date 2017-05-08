@@ -1,5 +1,6 @@
 # Supported tags and respective `Dockerfile` links
 
+-	[`1.12.0` (*nginx/Dockerfile*)](https://github.com/gleez/docker-images/blob/master/nginx/Dockerfile)
 -	[`1.10.3` (*nginx/Dockerfile*)](https://github.com/gleez/docker-images/blob/master/nginx/Dockerfile)
 -	[`1.10.2` (*nginx/Dockerfile*)](https://github.com/gleez/docker-images/blob/master/nginx/Dockerfile)
 
