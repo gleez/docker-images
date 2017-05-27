@@ -122,7 +122,7 @@ if [ !  -z "$CLUSTER_NAME" ]; then
     # get all task IP's
     readarray -t serviceIpArray <<< "$(dig -t A +short tasks.$SERVICE_NAME)"
 
-    echo -e "Trying to find a cluster node \n"
+    echo -e "Trying to find a cluster node "${serviceIpArray[@]}" \n"
 
     # find at least one node from the cluster that is in a cluster state or bootstrap as a new cluster
     for nodeIp in "${serviceIpArray[@]}"; do

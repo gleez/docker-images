@@ -77,15 +77,19 @@ TODO
     containers loose connectivity between each other after some time
 
 
-    RUN 
-    docker service create \
-    --publish 3306:3306 \
-    --name mysql --replicas 1 \
-    --network x \
-    -e MYSQL_ROOT_PASSWORD=1 \
-    -e SERVICE_NAME=mysql \
-    -e CLUSTER_NAME=cl  \
-    --mount type=bind,src=/home/Dockers/dockerfiles/percona/pxc-57/entrypoint.sh,dst=/entrypoint.sh \
-    --mount type=bind,src=/home/Dockers/dockerfiles/percona/pxc-57/healthcheck.sh,dst=/healthcheck.sh \
-    percona-xtradb-cluster bash -c "(/entrypoint.sh mysqld &) && while true; do  dig +short tasks.mysql | xargs -n1 ping -w1 -c1 ; sleep 2; done"
-
+RUN 
+docker service create \
+--publish 3306:3306 \
+--name mysql \
+--replicas 1 \
+--network mysql_net \
+-e MYSQL_ROOT_PASSWORD=1 \
+-e CLUSTER_NAME=cl  \
+-e SERVICE_ID={{.Service.ID}} \
+-e SERVICE_NAME={{.Service.Name}} \
+-e TASK_ID={{.Task.ID}} \
+-e TASK_NAME={{.Task.Name}} \
+-e TASK_SLOT={{.Task.Slot}} \
+--mount type=bind,src=/home/apps/volumes/mysql/{{.Task.Slot}},dst=/var/lib/mysql \
+--mount type=bind,src=/home/apps/log/mysql/{{.Task.Slot}},dst=/var/log/mysql \
+gleez/mysql:5.7 bash -c "(/entrypoint.sh mysqld &) && while true; do  dig +short tasks.mysql | xargs -n1 ping -w1 -c1 ; sleep 2; done"
