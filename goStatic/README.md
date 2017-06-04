@@ -34,7 +34,7 @@ Many links should provide you with additionnal info to see my point of view:
 docker run -d -p 443:443 -v path/to/website:/srv/http --name goStatic gleez/gostatic
 
 // HTTP server
-docker run -d -p 80:80 -v path/to/website:/srv/http --name goStatic gleez/gostatic --forceHTTP
+docker run -d -p 80:80 -v path/to/website:/srv/http --name goStatic gleez/gostatic --forceHTTP --forceHTML5
 ```
 
 #### For Auto TLS
@@ -73,7 +73,7 @@ Get the latest version from github
 Build it
 
 ```
-sudo docker run --rm -it -v "$PWD":/usr/src/myapp -w /usr/src/myapp golang:1.7.5 bash
+sudo docker run --rm -it -v "$PWD":/usr/src/myapp -w /usr/src/myapp golang:latest bash
 ```
 
 ```
