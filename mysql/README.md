@@ -6,6 +6,10 @@ The image supports work in Docker Network, including overlay networks,
 so that you can install Percona XtraDB Cluster nodes on different boxes.
 There is an initial support for the etcd discovery service.
 
+Build
+-----------
+docker build --force-rm=true --tag="$USER/mysql:5.7" .
+
 Basic usage
 -----------
 
