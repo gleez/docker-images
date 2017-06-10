@@ -1,4 +1,4 @@
-FROM gleez/hhvm:3.19.1
+FROM gleez/hhvm:3.20.2
 
 RUN mkdir -p /var/www
 
