@@ -15,11 +15,11 @@ sources = [
 
 # list of locations to recursively read blocklists from (warning, every file found is assumed to be a hosts-file or domain list)
 sourcedirs = [
-"~/grimd/sources"
+"/sources"
 ]
 
 # location of the log file
-log = "/log/grimd.log"
+log = "/config/grimd.log"
 
 # what kind of information should be logged, 0 = errors and important operations, 1 = dns queries, 2 = debug
 loglevel = 1

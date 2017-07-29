@@ -10,24 +10,21 @@ RUN apk --update upgrade && \
 	apk add --update ca-certificates && \
     rm -rf /tmp/* /var/tmp/* /var/cache/apk/* /var/cache/distfiles/*
 
-##COPY ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
-
 # Download grimd binary
 COPY grimd /bin/grimd
 
 # Chmod binary and add config folder
-RUN chmod a+x /bin/grimd && \
-  mkdir -p ~/grimd/config && \
-  ln -s ~/grimd/config /config
+RUN chmod a+x /bin/grimd && mkdir -p /config
+
 
 # Copy custom config file to volume
-COPY grimd.toml ~/grimd/config/grimd.toml
+COPY grimd.toml /config/grimd.toml
 
 # Forward appropriate ports
 EXPOSE 53/udp 53/tcp 8080/tcp
 
 # Read grimd.toml from volume
-VOLUME ["/config", "/log"]
+VOLUME ["/config"]
 
 # Run grimd
-ENTRYPOINT ["/bin/grimd", "-config", "~/grimd/config/grimd.toml", "-update"]
+ENTRYPOINT ["/bin/grimd", "-config", "/config/grimd.toml", "-update"]
