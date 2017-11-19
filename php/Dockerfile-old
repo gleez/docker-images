@@ -1,0 +1,135 @@
+FROM php:7.2-rc-fpm-alpine
+
+# Install tzdata and change to Asia/Kolkata
+RUN  set -x && \
+    apk --update add tzdata acl logrotate && \
+    ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime && \
+    date && \
+    rm -rf /var/cache/apk/*
+
+# Install tools...
+RUN set -x && \
+    apk --update add \
+      mysql-client \
+      bash \
+      grep \
+      zip \
+      unzip \
+      wget \
+      curl \
+      git \
+      nano \
+      unzip \
+      libtool \
+      libbz2 \
+      libzip \
+      libgmpxx \
+      libsodium \
+      libxslt \
+      libldap \
+      libevent \
+      libcurl \
+      libidn \
+      aspell-libs \
+      aspell-en \
+      tidyhtml-libs \
+      net-snmp-libs \
+      postgresql-libs \
+      libmemcached-libs \
+      imagemagick \
+      zlib \
+      c-client \
+      enchant \
+      gettext \
+      bison \
+      icu \
+      tar \
+      geoip \
+      icu-libs \
+      zlib-dev libmemcached-dev cyrus-sasl-dev libevent-dev libical-dev geoip-dev \
+      icu-dev imap-dev enchant-dev recode-dev tidyhtml-dev bzip2-dev gdbm-dev libidn-dev \
+      postgresql-dev imagemagick-dev net-snmp-dev libxslt-dev db-dev gettext-dev \
+      libc-dev gmp-dev libgomp aspell-dev libedit-dev libsodium-dev libzip-dev zlib-dev \
+      freetype libpng libjpeg-turbo freetype-dev libpng-dev libjpeg-turbo-dev libwebp-dev
+
+    RUN docker-php-ext-configure bcmath --enable-bcmath \
+    && docker-php-ext-configure calendar --enable-calendar \
+    && docker-php-ext-configure exif --enable-exif \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-configure imap --with-imap-ssl \
+    && docker-php-ext-configure intl --enable-intl \
+    && docker-php-ext-configure pcntl --enable-pcntl \
+    && docker-php-ext-configure pdo_mysql --with-pdo-mysql \
+    && docker-php-ext-configure pdo_pgsql --with-pdo-pgsql \
+    && docker-php-ext-configure pgsql --with-pgsql=/usr/include/postgresql/ \
+    && docker-php-ext-configure shmop --enable-shmop \
+    && docker-php-ext-configure soap --enable-soap \
+    && docker-php-ext-configure sockets --enable-sockets \
+    && docker-php-ext-configure sysvmsg --enable-sysvmsg \
+    && docker-php-ext-configure sysvsem --enable-sysvsem \
+    && docker-php-ext-configure sysvshm --enable-sysvshm \
+    && docker-php-ext-configure wddx --enable-wddx \
+    && docker-php-ext-configure zip --with-libzip
+
+    RUN docker-php-ext-install \
+       bcmath \
+       bz2 \
+       calendar \
+       enchant \
+       exif \
+       gd \
+       gettext \
+       gmp \
+       imap \
+       intl \
+       mysqli \
+       opcache \
+       pcntl \
+       pdo_mysql \
+       pdo_pgsql \
+       pgsql \
+       pspell \
+       shmop \
+       snmp \
+       soap \
+       sockets \
+       sodium \
+       sysvmsg \
+       sysvsem \
+       sysvshm \
+       tidy \
+       wddx \
+       xmlrpc \
+       xsl
+
+RUN apk update \
+    && apk add --no-cache --virtual .build-php $PHPIZE_DEPS \
+    && pecl install apcu memcached redis mongodb imagick geoip-beta \
+    && docker-php-ext-enable apcu memcached redis mongodb imagick geoip \
+    && pecl clear-cache \
+    && docker-php-source delete
+
+# geo-ip
+RUN mkdir -p /usr/share/GeoIP \
+    && cd /usr/share/GeoIP \
+    && wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz \
+    && gunzip GeoLiteCity.dat.gz \
+    && cp GeoLiteCity.dat GeoIPCity.dat
+
+   # Cleanup
+RUN apk del --purge \
+           *-dev \
+           build-base \
+           autoconf \
+           libtool
+
+RUN rm -rf \
+           /usr/include/php7 \
+           /usr/lib/php7/build \
+           /usr/lib/php7/modules/*.a \
+           /var/cache/apk/* \
+           /usr/share/man \
+           /usr/share/doc \
+           /usr/share/info \
+           /usr/share/locale \
+           /tmp/*
