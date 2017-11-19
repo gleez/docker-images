@@ -4,18 +4,18 @@ Alpine Linux PHP Dockerfile
 This repository contains Dockerfile of PHP running on Alpine Linux for Docker's automated build published to the public Docker Hub Registry.
 
 ### PHP Extensions optional
-ldap
-pgsql
-mongo
-redis
-geoip
-imagick
-memcache
-apcu
-xdebug
-event
-swoole
-hprose
+* ldap
+* pgsql
+* mongo
+* redis
+* geoip
+* imagick
+* memcache
+* apcu
+* xdebug
+* event
+* swoole
+* hprose
 
 The Base Image
 ---------------------
