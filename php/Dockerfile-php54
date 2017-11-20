@@ -14,14 +14,8 @@ LABEL description="PHP image based on Alpine" \
 ARG PHP_MIRROR=https://secure.php.net
 
 ARG PHP_CONF=" \
-    --prefix=/usr \
-    --libdir=/usr/lib/php \
-    --datadir=/usr/share/php \
-    --sysconfdir=/php/etc \
-    --localstatedir=/php/var \
-    --with-pear=/usr/share/php \
-    --with-config-file-scan-dir=/usr/local/etc/php/conf.d \
     --with-config-file-path=/usr/local/etc/php \
+    --with-config-file-scan-dir=/usr/local/etc/php/conf.d \
     --with-pic \
     --with-pcre-regex=/usr \
     --disable-short-tags \
@@ -185,6 +179,7 @@ RUN NB_CORES=${BUILD_CORES-$(getconf _NPROCESSORS_CONF)} \
   && make && make install && libtool --finish /usr/local/lib \
 
 ### PHP installation
+  && sed -e '/set -- --build\s*=.*/ s/^#*/#/' -i /usr/local/bin/docker-php-ext-configure \
   && mv /usr/src/php-${PHP_VER} /usr/src/php \
   && cd /usr/src/php \
   && export CFLAGS="$PHP_CFLAGS" \
@@ -200,15 +195,11 @@ RUN NB_CORES=${BUILD_CORES-$(getconf _NPROCESSORS_CONF)} \
   && chmod u+x /usr/local/bin/* \
   && docker-php-ext-install ${PHP_EXT_LIST} \
   && cp /usr/src/php/php.ini-production /usr/local/etc/php/php.ini \
-##  && pear config-set php_ini /usr/local/etc/php/php.ini \
-##  && pecl config-set php_ini /usr/local/etc/php/php.ini \
-  && pecl channel-update pecl.php.net \
+  && pecl update-channels \
+  && rm -rf /tmp/pear ~/.pearrc \
   && pecl install apc memcached-2.2.0 redis mongodb-1.2.11 imagick geoip \
   && docker-php-ext-enable apc memcached redis mongodb imagick geoip \
   && pecl clear-cache \
-
-### Sockets ext needs to be loaded before event ext
-##  && mv /usr/local/etc/php/conf.d/docker-php-ext-event.ini /usr/local/etc/php/conf.d/docker-php-ext-zz-event.ini \
 
 ### Add nginx user & group (docker run -t -i gleez/nginx:1.12.0 id nginx)
   && addgroup -S nginx \
@@ -217,22 +208,34 @@ RUN NB_CORES=${BUILD_CORES-$(getconf _NPROCESSORS_CONF)} \
 	&& adduser  -u 3000 -D -S -h /var/www -G app app \
 
   && mkdir /usr/local/etc/php-fpm.d \
+  && cp /usr/local/etc/php-fpm.conf.default /usr/local/etc/php-fpm.d/www.conf \
   && { \
       echo '[global]'; \
       echo 'include=/usr/local/etc/php-fpm.d/*.conf'; \
 } | tee /usr/local/etc/php-fpm.conf \
   && { \
     echo '[global]'; \
-    echo 'error_log = /proc/self/fd/2'; \
-    echo 'daemonize = no'; \
-} | tee /usr/local/etc/docker.conf \
+		echo 'error_log = /proc/self/fd/2'; \
+		echo; \
+		echo '[www]'; \
+		echo '; if we send this to /proc/self/fd/1, it never appears'; \
+		echo 'access.log = /proc/self/fd/2'; \
+		echo; \
+		echo 'clear_env = no'; \
+		echo; \
+		echo '; Ensure worker stdout and stderr are sent to the main error log.'; \
+		echo 'catch_workers_output = yes'; \
+} | tee /usr/local/etc/php-fpm.d/docker.conf \
   && { \
+    echo '[global]'; \
+    echo 'daemonize = no'; \
+    echo; \
     echo '[www]'; \
     echo '; if we send this to /proc/self/fd/1, it never appears'; \
-    echo 'listen = [::]:9000'; \
+    echo 'listen = 9000'; \
     echo 'user = nginx'; \
     echo 'group = nginx'; \
-    echo 'chdir = /var/www/html'; \
+    echo 'chdir = /var/www'; \
     echo; \
     echo 'pm = dynamic'; \
     echo 'pm.max_children = 9'; \
@@ -241,18 +244,14 @@ RUN NB_CORES=${BUILD_CORES-$(getconf _NPROCESSORS_CONF)} \
     echo 'pm.min_spare_servers = 2'; \
     echo 'pm.max_requests = 20'; \
     echo; \
-    echo 'request_terminate_timeout = 0'; \
-    echo 'request_slowlog_timeout = 1s'; \
-    echo 'slowlog = /proc/self/fd/2'; \
-    echo '; Ensure worker stdout and stderr are sent to the main error log.'; \
-    echo 'catch_workers_output = yes'; \
-    echo; \
-    echo 'access.log = /proc/self/fd/2'; \
-    echo 'clear_env = no'; \
     echo 'php_flag[display_errors] = on'; \
     echo 'php_admin_value[expose_php] = Off'; \
     echo 'php_admin_value[memory_limit] = 128M'; \
 } | tee /usr/local/etc/php-fpm.d/zz-docker.conf \
+  && sed -i  -e "s/user = nobody/user = nginx/g" /usr/local/etc/php-fpm.d/www.conf \
+  && sed -i  -e "s/group = nobody/group = nginx/g" /usr/local/etc/php-fpm.d/www.conf \
+  && sed -i  -e "s/listen = 127.0.0.1:9000/listen = 9000/g" /usr/local/etc/php-fpm.d/www.conf \
+  && sed -i  -e "s/;daemonize\s*=.*/daemonize = no/g" /usr/local/etc/php-fpm.d/www.conf \
   && sed -i \
     -e "s|upload_max_filesize\s*=.*|upload_max_filesize = 99M|" \
     -e "s|max_file_uploads\s*=.*|max_file_uploads = 20|" \
@@ -274,5 +273,9 @@ RUN NB_CORES=${BUILD_CORES-$(getconf _NPROCESSORS_CONF)} \
      /usr/share/info \
      /usr/share/locale
 
+ENTRYPOINT ["docker-php-entrypoint"]
+
 EXPOSE 9000
-WORKDIR /var/www/html
+WORKDIR /var/www
+
+CMD ["php-fpm"]
