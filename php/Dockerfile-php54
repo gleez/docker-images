@@ -162,6 +162,7 @@ RUN NB_CORES=${BUILD_CORES-$(getconf _NPROCESSORS_CONF)} \
     zlib \
     tar \
     xz \
+    msmtp \
     ${CUSTOM_PKGS} \
 
 ### Source downloading
@@ -260,6 +261,7 @@ RUN NB_CORES=${BUILD_CORES-$(getconf _NPROCESSORS_CONF)} \
     -e "s|;date.timezone\s*=.*|date.timezone = UTC|" \
     -e "s|mail.add_x_header\s*=.*|mail.add_x_header = Off|" \
     -e "s|expose_php\s*=.*|expose_php = Off|" \
+    -e "s|;sendmail_path\s*=.*|sendmail_path = /usr/bin/msmtp -t|" \
     /usr/local/etc/php/php.ini \
 
 # Cleanup
