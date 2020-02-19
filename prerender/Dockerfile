@@ -1,4 +1,4 @@
-FROM node:10.16-alpine
+FROM node:10.19-alpine:3.11
 
 ENV CHROME_BIN=/usr/bin/chromium-browser \
     CHROME_PATH=/usr/lib/chromium/
@@ -7,15 +7,13 @@ WORKDIR /app
 
 # Installs latest Chromium package.
 RUN addgroup -S prerender && adduser -S -g prerender prerender \
-    && echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories \
-    && echo @edge http://nl.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories \
     && apk add --no-cache zstd nspr snappy ttf-opensans \
     ca-certificates \
-    chromium@edge \
-    harfbuzz@edge \
-    nss@edge \
-    freetype@edge \
-    ttf-freefont@edge \
+    chromium \
+    harfbuzz \
+    nss \
+    freetype \
+    ttf-freefont \
     && yarn add prerender@5.6.0 \
     && rm -rf /var/cache/*
 
