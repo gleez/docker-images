@@ -16,9 +16,10 @@ RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
 		bash \
 		gcc \
+		gnupg \
+		go \
 		musl-dev \
 		openssl \
-		go \
 	; \
 	export \
 # set GOROOT_BOOTSTRAP such that we can actually build Go
@@ -87,6 +88,5 @@ RUN set -eux; \
 
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:$PATH
-
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 WORKDIR $GOPATH
