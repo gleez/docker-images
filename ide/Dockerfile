@@ -10,7 +10,7 @@ RUN [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.15.1
+ENV GOLANG_VERSION 1.15.3
 
 RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
