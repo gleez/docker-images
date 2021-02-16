@@ -1,4 +1,4 @@
-FROM node:10-alpine3.11
+FROM node:lts-alpine3.13
 
 RUN apk add --no-cache \
 		ca-certificates
@@ -10,7 +10,7 @@ RUN [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.15.3
+ENV GOLANG_VERSION 1.15.8
 
 RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
@@ -41,8 +41,8 @@ RUN set -eux; \
 	esac; \
 	\
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
-	url='https://storage.googleapis.com/golang/go1.15.1.src.tar.gz'; \
-	sha256='d3743752a421881b5cc007c76b4b68becc3ad053e61275567edab1c99e154d30'; \
+	url='https://storage.googleapis.com/golang/go1.15.8.src.tar.gz'; \
+	sha256='540c0ab7781084d124991321ed1458e479982de94454a98afab6acadf38497c2'; \
 	\
 	wget -O go.tgz.asc "$url.asc"; \
 	wget -O go.tgz "$url"; \
@@ -53,6 +53,7 @@ RUN set -eux; \
 # https://www.google.com/linuxrepositories/
 	gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys 'EB4C 1BFD 4F04 2F6D DDCC EC91 7721 F63B D38B 4796'; \
 	gpg --batch --verify go.tgz.asc go.tgz; \
+	gpgconf --kill all; \
 	rm -rf "$GNUPGHOME" go.tgz.asc; \
 	\
 	tar -C /usr/local -xzf go.tgz; \
