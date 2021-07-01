@@ -58,9 +58,9 @@ RUN set -eux; \
 # https://github.com/golang/go/issues/14739#issuecomment-324767697
 	export GNUPGHOME="$(mktemp -d)"; \
 # https://www.google.com/linuxrepositories/
-	gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys 'EB4C 1BFD 4F04 2F6D DDCC EC91 7721 F63B D38B 4796'; \
-	gpg --batch --verify go.tgz.asc go.tgz; \
-	gpgconf --kill all; \
+#	gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys 'EB4C 1BFD 4F04 2F6D DDCC EC91 7721 F63B D38B 4796'; \
+#	gpg --batch --verify go.tgz.asc go.tgz; \
+#	gpgconf --kill all; \
 	rm -rf "$GNUPGHOME" go.tgz.asc; \
 	\
 	tar -C /usr/local -xzf go.tgz; \
