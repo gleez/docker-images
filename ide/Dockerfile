@@ -10,7 +10,7 @@ RUN [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.15.8
+ENV GOLANG_VERSION 1.16.5
 
 RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
@@ -21,28 +21,35 @@ RUN set -eux; \
 		musl-dev \
 		openssl \
 	; \
-	export \
-# set GOROOT_BOOTSTRAP such that we can actually build Go
-		GOROOT_BOOTSTRAP="$(go env GOROOT)" \
-# ... and set "cross-building" related vars to the installed system's values so that we create a build targeting the proper arch
-# (for example, if our build host is GOARCH=amd64, but our build env/image is GOARCH=386, our build needs GOARCH=386)
-		GOOS="$(go env GOOS)" \
-		GOARCH="$(go env GOARCH)" \
-		GOHOSTOS="$(go env GOHOSTOS)" \
-		GOHOSTARCH="$(go env GOHOSTARCH)" \
-	; \
-# also explicitly set GO386 and GOARM if appropriate
-# https://github.com/docker-library/golang/issues/184
 	apkArch="$(apk --print-arch)"; \
 	case "$apkArch" in \
-		armhf) export GOARM='6' ;; \
-		armv7) export GOARM='7' ;; \
-		x86) export GO386='387' ;; \
+		'x86_64') \
+			export GOARCH='amd64' GOOS='linux'; \
+			;; \
+		'armhf') \
+			export GOARCH='arm' GOARM='6' GOOS='linux'; \
+			;; \
+		'armv7') \
+			export GOARCH='arm' GOARM='7' GOOS='linux'; \
+			;; \
+		'aarch64') \
+			export GOARCH='arm64' GOOS='linux'; \
+			;; \
+		'x86') \
+			export GO386='softfloat' GOARCH='386' GOOS='linux'; \
+			;; \
+		'ppc64le') \
+			export GOARCH='ppc64le' GOOS='linux'; \
+			;; \
+		's390x') \
+			export GOARCH='s390x' GOOS='linux'; \
+			;; \
+		*) echo >&2 "error: unsupported architecture '$apkArch' (likely packaging update needed)"; exit 1 ;; \
 	esac; \
 	\
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
-	url='https://storage.googleapis.com/golang/go1.15.8.src.tar.gz'; \
-	sha256='540c0ab7781084d124991321ed1458e479982de94454a98afab6acadf38497c2'; \
+	url='https://dl.google.com/go/go1.16.5.src.tar.gz'; \
+	sha256='7bfa7e5908c7cc9e75da5ddf3066d7cbcf3fd9fa51945851325eebc17f50ba80'; \
 	\
 	wget -O go.tgz.asc "$url.asc"; \
 	wget -O go.tgz "$url"; \
@@ -59,21 +66,31 @@ RUN set -eux; \
 	tar -C /usr/local -xzf go.tgz; \
 	rm go.tgz; \
 	\
-	goEnv="$(go env | sed -rn -e '/^GO(OS|ARCH|ARM|386)=/s//export \0/p')"; \
-	eval "$goEnv"; \
-	[ -n "$GOOS" ]; \
-	[ -n "$GOARCH" ]; \
 	( \
 		cd /usr/local/go/src; \
+# set GOROOT_BOOTSTRAP + GOHOST* such that we can build Go successfully
+		export GOROOT_BOOTSTRAP="$(go env GOROOT)" GOHOSTOS="$GOOS" GOHOSTARCH="$GOARCH"; \
+		if [ -n "${GO386:-}" ]; then \
+# https://github.com/docker-library/golang/issues/359 -> https://github.com/golang/go/issues/44500
+# Go 1.15 + Alpine 3.14 == Go 1.16 bootstrap
+# Go 1.16 + Alpine 3.13 == Go 1.15 bootstrap
+# (once Go 1.15 *and* Alpine 3.13 go away, we can remove this)
+			GO386= ./bootstrap.bash; \
+			export GOROOT_BOOTSTRAP="/usr/local/go-$GOOS-$GOARCH-bootstrap"; \
+			"$GOROOT_BOOTSTRAP/bin/go" version; \
+		fi; \
 		./make.bash; \
+		if [ -n "${GO386:-}" ]; then \
+			rm -rf "$GOROOT_BOOTSTRAP"; \
+		fi; \
 	); \
-	\
-	apk del --no-network .build-deps; \
 	\
 # pre-compile the standard library, just like the official binary release tarballs do
 	go install std; \
 # go install: -race is only supported on linux/amd64, linux/ppc64le, linux/arm64, freebsd/amd64, netbsd/amd64, darwin/amd64 and windows/amd64
 #	go install -race std; \
+	\
+	apk del --no-network .build-deps; \
 	\
 # remove a few intermediate / bootstrapping files the official binary release tarballs do not contain
 	rm -rf \
