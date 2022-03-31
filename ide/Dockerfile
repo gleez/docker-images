@@ -1,4 +1,4 @@
-FROM node:lts-alpine3.13
+FROM node:14-alpine3.15
 
 RUN apk add --no-cache ca-certificates
 
@@ -9,7 +9,7 @@ RUN [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.17
+ENV GOLANG_VERSION 1.18
 
 RUN set -eux; \
 	apk add --no-cache --virtual .fetch-deps gnupg; \
@@ -43,8 +43,8 @@ RUN set -eux; \
 	if [ -z "$url" ]; then \
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
 		build=1; \
-		url='https://dl.google.com/go/go1.17.src.tar.gz'; \
-		sha256='3a70e5055509f347c0fb831ca07a2bf3b531068f349b14a3c652e9b5b67beb5d'; \
+		url='https://dl.google.com/go/go1.18.src.tar.gz'; \
+		sha256='38f423db4cc834883f2b52344282fa7a39fbb93650dc62a11fdf0be6409bdad6'; \
 # the precompiled binaries published by Go upstream are not compatible with Alpine, so we always build from source here 😅
 	fi; \
 	\
@@ -55,7 +55,9 @@ RUN set -eux; \
 # https://github.com/golang/go/issues/14739#issuecomment-324767697
 	GNUPGHOME="$(mktemp -d)"; export GNUPGHOME; \
 # https://www.google.com/linuxrepositories/
-	gpg --batch --keyserver keyserver.ubuntu.com --recv-keys 'EB4C 1BFD 4F04 2F6D DDCC EC91 7721 F63B D38B 4796'; \
+	gpg --batch --keyserver keyserver.ubuntu.com --recv-keys 'EB4C 1BFD 4F04 2F6D DDCC  EC91 7721 F63B D38B 4796'; \
+# let's also fetch the specific subkey of that key explicitly that we expect "go.tgz.asc" to be signed by, just to make sure we definitely have it
+	gpg --batch --keyserver keyserver.ubuntu.com --recv-keys '2F52 8D36 D67B 69ED F998  D857 78BD 6547 3CB3 BD13'; \
 	gpg --batch --verify go.tgz.asc go.tgz; \
 	gpgconf --kill all; \
 	rm -rf "$GNUPGHOME" go.tgz.asc; \
@@ -70,31 +72,23 @@ RUN set -eux; \
 			go \
 			musl-dev \
 		; \
+		if [ "$GOARCH" = 'ppc64le' ]; then \
+# https://github.com/golang/go/issues/51787
+			wget -O ppc64le-alpine.patch 'https://github.com/golang/go/commit/946167906ed8646c433c257b074a10e01f0a7dab.patch'; \
+			apk add --no-cache --virtual .build-patch patch; \
+			patch --strip=1 --input="$PWD/ppc64le-alpine.patch" --directory=/usr/local/go; \
+			apk del --no-network .build-patch; \
+			rm ppc64le-alpine.patch; \
+		fi; \
 		\
 		( \
 			cd /usr/local/go/src; \
 # set GOROOT_BOOTSTRAP + GOHOST* such that we can build Go successfully
 			export GOROOT_BOOTSTRAP="$(go env GOROOT)" GOHOSTOS="$GOOS" GOHOSTARCH="$GOARCH"; \
-			if [ -n "${GO386:-}" ]; then \
-# https://github.com/docker-library/golang/issues/359 -> https://github.com/golang/go/issues/44500
-# Go 1.16 + Alpine 3.13 == Go 1.15 bootstrap
-# (once Alpine 3.13 goes away, we can remove this)
-				GO386= ./bootstrap.bash; \
-				export GOROOT_BOOTSTRAP="/usr/local/go-$GOOS-$GOARCH-bootstrap"; \
-				"$GOROOT_BOOTSTRAP/bin/go" version; \
-			fi; \
 			./make.bash; \
-			if [ -n "${GO386:-}" ]; then \
-				rm -rf "$GOROOT_BOOTSTRAP"; \
-			fi; \
 		); \
 		\
 		apk del --no-network .build-deps; \
-		\
-# pre-compile the standard library, just like the official binary release tarballs do
-		go install std; \
-# go install: -race is only supported on linux/amd64, linux/ppc64le, linux/arm64, freebsd/amd64, netbsd/amd64, darwin/amd64 and windows/amd64
-#		go install -race std; \
 		\
 # remove a few intermediate / bootstrapping files the official binary release tarballs do not contain
 		rm -rf \
